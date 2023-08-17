@@ -1,0 +1,9 @@
+name: AabernathyPaper
+version: 1.0.0
+main: adt.aabernathypaper.AabernathyPaper
+description: Core functionality plugin for Aabernathy.
+author: WilkinsonK
+api-version: '1.19'
+depend: [Vault]
+libraries:
+  - 'com.google.guava:guava:31.1-jre'
