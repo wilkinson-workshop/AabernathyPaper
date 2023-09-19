@@ -1,0 +1,21 @@
+debug: false
+
+tradeables:
+  # The items pointed to as the base value for the
+  # rest of the economy. As the value of this
+  # item is raised or lowered, so too will the
+  # values of either items be affected.
+  root_item: DIAMOND
+
+  # Used to modify an item's buy weight before
+  # applying the final multiplier.
+  buy_offset: 0.0
+
+  # Used to calculate how heavy the final sell
+  # weight should be.
+  sell_offset: 0.0
+
+  # This dictates, as the initial calculation,
+  # what percentage of the buy price should the
+  # sell price of items be considered at.
+  sell_weight: 0.7322

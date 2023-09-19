@@ -16,12 +16,20 @@ repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
     maven {
-        name = 'papermc'
-        url = 'https://repo.papermc.io/repository/maven-public/'
+        name = 'essentialsx-releases'
+        url = 'https://repo.essentialsx.net/releases/'
+    }
+    maven {
+        name = 'chestshop-repo'
+        url = 'https://repo.minebench.de/'
     }
     maven {
         name = 'jitpack'
         url = 'https://jitpack.io'
+    }
+    maven {
+        name = 'papermc'
+        url = 'https://repo.papermc.io/repository/maven-public/'
     }
 }
 
@@ -31,14 +39,16 @@ dependencies {
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:31.1-jre'
-    compileOnly 'io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT'
+    compileOnly 'com.acrobot.chestshop:chestshop:3.12'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
+    compileOnly 'io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT'
+    compileOnly 'net.essentialsx:EssentialsX:2.20.1'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(20)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 

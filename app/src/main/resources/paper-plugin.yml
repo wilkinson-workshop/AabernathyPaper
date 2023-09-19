@@ -1,0 +1,20 @@
+name: AabernathyPaper
+version: '1.0.0'
+main: adt.aabernathypaper.AabernathyPaper
+description: Core functionality plugin for Aabernathy.
+authors: [WilkinsonK]
+api-version: '1.20'
+dependencies:
+  server:
+    Essentials:
+      load: AFTER
+      required: true
+      join-classpath: false
+    ChestShop:
+      load: AFTER
+      required: true
+      join-classpath: false
+    Vault:
+      load: AFTER
+      required: true
+      join-classpath: false

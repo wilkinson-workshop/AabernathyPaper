@@ -4,6 +4,6 @@ main: adt.aabernathypaper.AabernathyPaper
 description: Core functionality plugin for Aabernathy.
 author: WilkinsonK
 api-version: '1.20'
-depend: [Vault]
+depend: [EssentialsX, Vault]
 libraries:
   - 'com.google.guava:guava:31.1-jre'

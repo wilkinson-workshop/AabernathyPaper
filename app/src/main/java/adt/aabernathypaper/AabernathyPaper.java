@@ -3,135 +3,70 @@
  */
 package adt.aabernathypaper;
 
-import java.util.logging.Logger;
-
-import net.kyori.adventure.text.Component;
-import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.permission.Permission;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Item;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import io.papermc.paper.event.block.BlockBreakBlockEvent;
+
 public class AabernathyPaper extends JavaPlugin implements Listener {
-    private Economy economy;
-    private Permission permissions;
-    private Logger logger = getLogger();
-
-    // Coordinates relative to a single voxel.
-    private int searchPath[][] = {
-        {-1, -1, -1 }, // LWR NW
-        {-1, -1,  0 }, // LWR W
-        { 0, -1,  0 }, // LWR CTR
-        { 0, -1, -1 }, // LWR N
-
-        {-1,  0, -1 }, // CTR NW
-        {-1,  0,  0 }, // CTR W
-        { 0,  0,  0 }, // CTR CTR
-        { 0,  0, -1 }, // CTR N
-
-        {-1,  1, -1 }, // UPR NW
-        {-1,  1,  0 }, // UPR W
-        { 0,  1,  0 }, // UPR CTR
-        { 0,  1, -1 }, // UPR N
-    };
 
     @Override
     public void onEnable() {
-        logger.info(String.format(
-            "Starting [%s] version (%s).",
-            getName(),
-            getPluginMeta().getVersion()));
-
-        if (!setupEconomy()) {
-            logger.warning("Could not find an economy instance. Some " +
-                           "features may not work.");
-        }
-        setupPermissions();
+        getServer().getPluginManager().registerEvents(this, this);
+        saveDefaultConfig();
     }
 
     @Override
     public void onDisable() {
-        logger.info(String.format(
-            "Stopping [%s] version (%s).",
-            getName(),
-            getPluginMeta().getVersion()));
     }
 
-    private boolean setupEconomy() {
-        if (getServer().getPluginManager().getPlugin("Vault") == null) {
-            return false;
+    public ConfigurationSection econGetItemDefiniton(String name) {
+        return getConfig()
+            .getConfigurationSection("dynamic_econ")
+            .getConfigurationSection(name);
+    }
+
+    public Double econGetItemWeight(String name) {
+        return econGetItemDefiniton(name)
+            .getDouble("weight_offset");
+    }
+
+    public Boolean econItemDefined(String name) {
+        return getConfig()
+            .getConfigurationSection("dynamic_econ")
+            .contains(name);
+    }
+
+    public Boolean econItemIsRoot(String name) {
+        return econGetItemDefiniton(name)
+            .getBoolean("root_item");
+    }
+
+    @EventHandler
+    public void handleBlockBroken(BlockBreakBlockEvent event) {
+        Block block = event.getBlock();
+
+        if (block.getType().isInteractable())
+            return;
+    }
+
+    @EventHandler
+    public void handleOnItemDrop(BlockDropItemEvent event) {
+        String itemName;
+
+        for (Item item : event.getItems()) {
+            itemName = item
+                .getName()
+                .toLowerCase()
+                .replace(" ", "_");
+
+            if (!econItemDefined(itemName))
+                continue;
         }
-        RegisteredServiceProvider<Economy> rsp = getServer()
-            .getServicesManager()
-            .getRegistration(Economy.class);
-
-        if (rsp == null) {
-            return false;
-        }
-        economy = rsp.getProvider();
-        return economy != null;
-    }
-
-    private boolean setupPermissions() {
-        RegisteredServiceProvider<Permission> rsp = getServer()
-            .getServicesManager()
-            .getRegistration(Permission.class);
-        permissions = rsp.getProvider();
-        return permissions != null;
-    }
-
-    public Economy getEconomy() {
-        return economy;
-    }
-
-    public Permission getPermissions() {
-        return permissions;
-    }
-
-    /**
-     * Checks the neighbors of a given block to see how many of those neighbors
-     * are the target material.
-     * @param vector
-     * @param material
-     */
-    private int voxelNeighborsAreMaterial(Block voxel, Material material) {
-        int neighborCount = 0;
-        for (int rc[] : searchPath) {
-            if (voxel.getRelative(rc[0], rc[1], rc[2]).getType() == material)
-                neighborCount++;
-        }
-        return neighborCount;
-    }
-
-    /**
-     * Perform a search in a single chunk for the number of blocks which match
-     * the target material.
-     * @param chunk
-     * @param material
-     */
-    private int searchChunkForMaterial(Chunk chunk, Material material) {
-        int foundCount = 0;
-        int chunk_size    = 16;
-        int sprawlers     = chunk_size / 2;
-
-        int yMin = chunk.getWorld().getMinHeight();
-        int yMax = chunk.getWorld().getMaxHeight();
-        for (int y = yMin; y < yMax; y++) {
-            for (int x = 1; x < sprawlers; x+=2) {
-                for (int z = 1; z < sprawlers; z+=2) {
-                    foundCount += voxelNeighborsAreMaterial(
-                        chunk.getBlock(x, y, z),
-                        material);
-                }
-            }
-        }
-
-
-        return foundCount;
     }
 }
